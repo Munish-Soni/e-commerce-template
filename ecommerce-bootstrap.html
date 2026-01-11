@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Platform</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --bg-light: #f9fafb;
+            --transition: all 0.2s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--text-primary);
+            background: var(--bg-light);
+        }
+
+        .icon {
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Sign-in Page */
+        .signin-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+        }
+
+        .signin-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        /* Customer Interface */
+        .customer-nav {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .product-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: var(--bg-light);
+        }
+
+        /* Seller Interface */
+        .seller-sidebar {
+            background: white;
+            border-right: 1px solid var(--border);
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .seller-nav-item {
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 0.5rem;
+        }
+
+        .seller-nav-item:hover {
+            background: var(--bg-light);
+        }
+
+        .seller-nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Admin Interface */
+        .admin-sidebar {
+            background: #1f2937;
+            color: white;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .admin-nav-item {
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 0.5rem;
+            color: #9ca3af;
+        }
+
+        .admin-nav-item:hover {
+            background: #374151;
+            color: white;
+        }
+
+        .admin-nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .table-actions button {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .account-dropdown {
+            position: relative;
+        }
+
+        .account-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            min-width: 200px;
+            margin-top: 0.5rem;
+            z-index: 1000;
+        }
+
+        .account-menu-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .account-menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .account-menu-item:hover {
+            background: var(--bg-light);
+        }
+
+        .modal-backdrop-custom {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1050;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content-custom {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Category Menu Styles */
+        .category-menu-sidebar {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 320px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 12px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .category-menu-sidebar.show {
+            left: 0;
+        }
+
+        .category-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .category-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .category-menu-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .category-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .category-item:hover {
+            background: var(--bg-light);
+        }
+
+        .category-item.active {
+            background: var(--bg-light);
+            color: var(--primary);
+            border-left: 3px solid var(--primary);
+        }
+
+        .subcategory-list {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: var(--bg-light);
+        }
+
+        .subcategory-list.show {
+            max-height: 500px;
+        }
+
+        .subcategory-item {
+            padding: 0.75rem 1.5rem 0.75rem 3rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .subcategory-item:hover {
+            background: white;
+        }
+
+        .subcategory-item.active {
+            color: var(--primary);
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sign-in Page -->
+    <div id="signinPage" class="signin-container">
+        <div class="signin-card">
+            <div class="text-center mb-4">
+                <h1 class="h3 mb-2">Welcome Back</h1>
+                <p class="text-secondary">Sign in to your account</p>
+            </div>
+            
+            <form id="signinForm" onsubmit="return handleSignin(event)">
+                <div class="mb-3">
+                    <label class="form-label">User Type</label>
+                    <select class="form-select" id="userType" required>
+                        <option value="customer" selected>Customer</option>
+                        <option value="seller">Seller</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" placeholder="you@example.com" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="••••••••" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100 mb-3">Sign In</button>
+                
+                <p class="text-center text-secondary small mb-0">
+                    Demo credentials:<br>
+                    Customer: customer@demo.com / password<br>
+                    Seller: seller@demo.com / password<br>
+                    Admin: admin@demo.com / password
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Customer Interface -->
+    <div id="customerInterface" class="hidden">
+        <nav class="customer-nav">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn btn-link text-dark p-0 border-0" onclick="toggleCategoryMenu()" style="text-decoration: none;">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <line x1="3" y1="12" x2="21" y2="12" style="stroke: currentColor; stroke-width: 2;"/>
+                                <line x1="3" y1="6" x2="21" y2="6" style="stroke: currentColor; stroke-width: 2;"/>
+                                <line x1="3" y1="18" x2="21" y2="18" style="stroke: currentColor; stroke-width: 2;"/>
+                            </svg>
+                        </button>
+                        <h1 class="h4 mb-0">Store</h1>
+                    </div>
+                    <div class="d-flex gap-3 align-items-center">
+                        <div class="account-dropdown">
+                            <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2" onclick="toggleAccountMenu('customer')">
+                                <svg class="icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="12" cy="7" r="4"/>
+                                </svg>
+                                Account
+                            </button>
+                            <div class="account-menu hidden" id="customerAccountMenu">
+                                <div class="account-menu-item" onclick="showAccountSettings('customer')">
+                                    <svg class="icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                                        <circle cx="12" cy="12" r="3"/>
+                                        <path d="M12 1v6m0 6v6m8.66-15l-3 5.196M6.34 15.804L3.34 21M23 12h-6m-6 0H1m20.66 3l-3-5.196M6.34 8.196L3.34 3"/>
+                                    </svg>
+                                    Account Settings
+                                </div>
+                                <div class="account-menu-item" onclick="showOrderHistory()">
+                                    <svg class="icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                                    </svg>
+                                    Order History
+                                </div>
+                                <div class="account-menu-item" onclick="signOut()">
+                                    <svg class="icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+                                    </svg>
+                                    Sign Out
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+        <main class="container py-4">
+            <div class="mb-4">
+                <input type="text" class="form-control" placeholder="Search products..." id="customerSearch">
+            </div>
+            
+            <div class="product-grid" id="customerProducts">
+                <!-- Products will be rendered here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Seller Interface -->
+    <div id="sellerInterface" class="hidden">
+        <div class="d-flex">
+            <div class="seller-sidebar" style="width: 250px;">
+                <h4 class="mb-4">Seller Dashboard</h4>
+                <div class="seller-nav-item active" onclick="showSellerSection('products')">
+                    <svg class="icon d-inline" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    My Products
+                </div>
+                <div class="seller-nav-item" onclick="showSellerSection('orders')">
+                    <svg class="icon d-inline" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    Orders
+                </div>
+                <div class="seller-nav-item" onclick="showSellerSection('add')">
+                    <svg class="icon d-inline" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Add Product
+                </div>
+                <div class="seller-nav-item" onclick="showSellerSection('account')">
+                    <svg class="icon d-inline" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6"/></svg>
+                    Account Settings
+                </div>
+                <div class="seller-nav-item" onclick="signOut()">
+                    <svg class="icon d-inline" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                    Sign Out
+                </div>
+            </div>
+            
+            <div class="flex-grow-1 p-4" style="background: var(--bg-light);">
+                <div id="sellerProducts">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3>My Products</h3>
+                        <button class="btn btn-primary" onclick="showSellerSection('add')">Add New Product</button>
+                    </div>
+                    
+                    <div class="bg-white rounded p-3">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sellerProductList">
+                                <tr>
+                                    <td>Wireless Earbuds Pro</td>
+                                    <td>$89.99</td>
+                                    <td>15</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td class="table-actions">
+                                        <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                        <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div id="sellerOrders" class="hidden">
+                    <h3 class="mb-4">Orders</h3>
+                    <div class="bg-white rounded p-3">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Product</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#ORD-001</td>
+                                    <td>John Doe</td>
+                                    <td>Wireless Earbuds Pro</td>
+                                    <td>$89.99</td>
+                                    <td><span class="badge bg-warning">Pending</span></td>
+                                    <td class="table-actions">
+                                        <button class="btn btn-sm btn-success">Ship</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div id="sellerAdd" class="hidden">
+                    <h3 class="mb-4">Add New Product</h3>
+                    <div class="bg-white rounded p-4" style="max-width: 600px;">
+                        <form>
+                            <div class="mb-3">
+                                <label class="form-label">Product Name</label>
+                                <input type="text" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Price</label>
+                                <input type="number" class="form-control" step="0.01" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Category</label>
+                                <select class="form-select" required>
+                                    <option value="">Select category...</option>
+                                    <option value="electronics">Electronics</option>
+                                    <option value="accessories">Accessories</option>
+                                    <option value="footwear">Footwear</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Stock Quantity</label>
+                                <input type="number" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Product Image URL</label>
+                                <input type="url" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" rows="4"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Product</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div id="sellerAccount" class="hidden">
+                    <h3 class="mb-4">Account Settings</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="bg-white rounded p-4 mb-3">
+                                <h5 class="mb-3">Profile Information</h5>
+                                <form>
+                                    <div class="mb-3">
+                                        <label class="form-label">Store Name</label>
+                                        <input type="text" class="form-control" value="TechStore">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" value="seller@demo.com">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Phone</label>
+                                        <input type="tel" class="form-control" value="+1 234 567 8900">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Address</label>
+                                        <textarea class="form-control" rows="3">123 Business St, City, Country</textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="bg-white rounded p-4 mb-3">
+                                <h5 class="mb-3">Change Password</h5>
+                                <form>
+                                    <div class="mb-3">
+                                        <label class="form-label">Current Password</label>
+                                        <input type="password" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">New Password</label>
+                                        <input type="password" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Confirm Password</label>
+                                        <input type="password" class="form-control">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Update Password</button>
+                                </form>
+                            </div>
+                            <div class="bg-white rounded p-4">
+                                <h5 class="mb-3">Payment Settings</h5>
+                                <form>
+                                    <div class="mb-3">
+                                        <label class="form-label">Bank Account</label>
+                                        <input type="text" class="form-control" value="****1234">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Tax ID</label>
+                                        <input type="text" class="form-control" value="12-3456789">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Update Payment Info</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Interface -->
+    <div id="adminInterface" class="hidden">
+        <div class="d-flex">
+            <div class="admin-sidebar" style="width: 250px;">
+                <h4 class="mb-4 text-white">Admin Panel</h4>
+                <div class="admin-nav-item active" onclick="showAdminSection('dashboard')">
+                    <svg class="icon d-inline" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+                    Dashboard
+                </div>
+                <div class="admin-nav-item" onclick="showAdminSection('users')">
+                    <svg class="icon d-inline" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    Users
+                </div>
+                <div class="admin-nav-item" onclick="showAdminSection('products')">
+                    <svg class="icon d-inline" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                    All Products
+                </div>
+                <div class="admin-nav-item" onclick="showAdminSection('orders')">
+                    <svg class="icon d-inline" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    All Orders
+                </div>
+                <div class="admin-nav-item" onclick="showAdminSection('settings')">
+                    <svg class="icon d-inline" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m8.66-15l-3 5.196M6.34 15.804L3.34 21M23 12h-6m-6 0H1m20.66 3l-3-5.196M6.34 8.196L3.34 3"/></svg>
+                    Settings
+                </div>
+                <div class="admin-nav-item" onclick="signOut()">
+                    <svg class="icon d-inline" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                    Sign Out
+                </div>
+            </div>
+            
+            <div class="flex-grow-1 p-4">
+                <div id="adminDashboard">
+                    <h3 class="mb-4">Dashboard Overview</h3>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <p class="text-secondary small mb-1">Total Revenue</p>
+                                        <h4 class="mb-0">$45,231</h4>
+                                    </div>
+                                    <div class="stat-icon" style="background: #dbeafe; color: var(--primary);">
+                                        <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                    </div>
+                                </div>
+                                <span class="badge bg-success">+12.5%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <p class="text-secondary small mb-1">Total Users</p>
+                                        <h4 class="mb-0">1,234</h4>
+                                    </div>
+                                    <div class="stat-icon" style="background: #dcfce7; color: var(--success);">
+                                        <svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                                    </div>
+                                </div>
+                                <span class="badge bg-success">+8.2%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <p class="text-secondary small mb-1">Total Orders</p>
+                                        <h4 class="mb-0">567</h4>
+                                    </div>
+                                    <div class="stat-icon" style="background: #fef3c7; color: var(--warning);">
+                                        <svg class="icon" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+                                    </div>
+                                </div>
+                                <span class="badge bg-warning">+5.1%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <p class="text-secondary small mb-1">Active Sellers</p>
+                                        <h4 class="mb-0">89</h4>
+                                    </div>
+                                    <div class="stat-icon" style="background: #fce7f3; color: #ec4899;">
+                                        <svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg>
+                                    </div>
+                                </div>
+                                <span class="badge bg-success">+3.4%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded p-3 mb-4">
+                        <h5 class="mb-3">Recent Orders</h5>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Product</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#ORD-001</td>
+                                    <td>John Doe</td>
+                                    <td>Wireless Earbuds Pro</td>
+                                    <td>$89.99</td>
+                                    <td><span class="badge bg-success">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#ORD-002</td>
+                                    <td>Jane Smith</td>
+                                    <td>Smart Watch Series 5</td>
+                                    <td>$299.99</td>
+                                    <td><span class="badge bg-warning">Pending</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div id="adminUsers" class="hidden">
+                    <h3 class="mb-4">User Management</h3>
+                    <div class="bg-white rounded p-3">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#USER-001</td>
+                                    <td>John Doe</td>
+                                    <td>john@example.com</td>
+                                    <td><span class="badge bg-info">Customer</span></td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td class="table-actions">
+                                        <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                        <button class="btn btn-sm btn-outline-danger">Block</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#USER-002</td>
+                                    <td>Jane Smith</td>
+                                    <td>jane@example.com</td>
+                                    <td><span class="badge bg-warning">Seller</span></td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td class="table-actions">
+                                        <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                        <button class="btn btn-sm btn-outline-danger">Block</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div id="adminProducts" class="hidden">
+                    <h3 class="mb-4">All Products</h3>
+                    <div class="bg-white rounded p-3">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Product ID</th>
+                                    <th>Name</th>
+                                    <th>Seller</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#PROD-001</td>
+                                    <td>Wireless Earbuds Pro</td>
+                                    <td>TechStore</td>
+                                    <td>$89.99</td>
+                                    <td>15</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td class="table-actions">
+                                        <button class="btn btn-sm btn-outline-danger">Remove</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div id="adminOrders" class="hidden">
+                    <h3 class="mb-4">All Orders</h3>
+                    <div class="bg-white rounded p-3">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Seller</th>
+                                    <th>Product</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#ORD-001</td>
+                                    <td>John Doe</td>
+                                    <td>TechStore</td>
+                                    <td>Wireless Earbuds Pro</td>
+                                    <td>$89.99</td>
+                                    <td><span class="badge bg-warning">Pending</span></td>
+                                    <td class="table-actions">
+                                        <button class="btn btn-sm btn-outline-primary">View</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div id="adminSettings" class="hidden">
+                    <h3 class="mb-4">Platform Settings</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="bg-white rounded p-4 mb-3">
+                                <h5 class="mb-3">Admin Profile</h5>
+                                <form>
+                                    <div class="mb-3">
+                                        <label class="form-label">Full Name</label>
+                                        <input type="text" class="form-control" value="Admin User">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" value="admin@demo.com">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Phone</label>
+                                        <input type="tel" class="form-control" value="+1 234 567 8900">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save Profile</button>
+                                </form>
+                            </div>
+                            <div class="bg-white rounded p-4">
+                                <h5 class="mb-3">Security</h5>
+                                <form>
+                                    <div class="mb-3">
+                                        <label class="form-label">Current Password</label>
+                                        <input type="password" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">New Password</label>
+                                        <input type="password" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Confirm Password</label>
+                                        <input type="password" class="form-control">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Update Password</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="bg-white rounded p-4 mb-3">
+                                <h5 class="mb-3">Platform Configuration</h5>
+                                <form>
+                                    <div class="mb-3">
+                                        <label class="form-label">Platform Name</label>
+                                        <input type="text" class="form-control" value="E-Commerce Platform">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Support Email</label>
+                                        <input type="email" class="form-control" value="support@platform.com">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Commission Rate (%)</label>
+                                        <input type="number" class="form-control" value="10">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Currency</label>
+                                        <select class="form-select">
+                                            <option>USD ($)</option>
+                                            <option>EUR (€)</option>
+                                            <option>GBP (£)</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                                </form>
+                            </div>
+                            <div class="bg-white rounded p-4">
+                                <h5 class="mb-3">System Status</h5>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Server Status</span>
+                                        <span class="badge bg-success">Online</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Database Status</span>
+                                        <span class="badge bg-success">Connected</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Last Backup</span>
+                                        <span class="text-secondary small">2 hours ago</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-primary w-100">Run System Check</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Settings Modal (for Customer) -->
+    <div id="accountModal" class="modal-backdrop-custom hidden" onclick="closeAccountModal(event)">
+        <div class="modal-content-custom" onclick="event.stopPropagation()">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0">Account Settings</h4>
+                <button class="btn-close" onclick="closeAccountModal()"></button>
+            </div>
+            
+            <form>
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" value="John Doe">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" value="customer@demo.com">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-control" value="+1 234 567 8900">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Shipping Address</label>
+                    <textarea class="form-control" rows="3">123 Main St, Apt 4B, City, State 12345</textarea>
+                </div>
+                
+                <hr class="my-4">
+                
+                <h5 class="mb-3">Change Password</h5>
+                <div class="mb-3">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">New Password</label>
+                    <input type="password" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control">
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="closeAccountModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Order History Modal (for Customer) -->
+    <div id="orderModal" class="modal-backdrop-custom hidden" onclick="closeOrderModal(event)">
+        <div class="modal-content-custom" onclick="event.stopPropagation()">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0">Order History</h4>
+                <button class="btn-close" onclick="closeOrderModal()"></button>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#ORD-001</td>
+                            <td>Jan 10, 2024</td>
+                            <td>$89.99</td>
+                            <td><span class="badge bg-success">Delivered</span></td>
+                        </tr>
+                        <tr>
+                            <td>#ORD-002</td>
+                            <td>Jan 8, 2024</td>
+                            <td>$299.99</td>
+                            <td><span class="badge bg-warning">Shipped</span></td>
+                        </tr>
+                        <tr>
+                            <td>#ORD-003</td>
+                            <td>Jan 5, 2024</td>
+                            <td>$129.99</td>
+                            <td><span class="badge bg-success">Delivered</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <button class="btn btn-outline-secondary w-100" onclick="closeOrderModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Category Menu Sidebar (Hamburger Menu) -->
+    <div class="category-overlay" id="categoryOverlay" onclick="closeCategoryMenu()"></div>
+    <div class="category-menu-sidebar" id="categoryMenuSidebar">
+        <div class="category-menu-header">
+            <h5 class="mb-0">Categories</h5>
+            <button class="btn-close" onclick="closeCategoryMenu()"></button>
+        </div>
+        
+        <div class="category-item" onclick="filterByCategory('all')">
+            <div class="d-flex justify-content-between align-items-center">
+                <strong>All Products</strong>
+                <span class="badge bg-secondary">12</span>
+            </div>
+        </div>
+        
+        <div class="category-item" onclick="toggleSubcategories('electronics')">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <svg class="icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                    <strong>Electronics</strong>
+                </div>
+                <span class="badge bg-secondary">5</span>
+            </div>
+        </div>
+        <div class="subcategory-list" id="electronics-subs">
+            <div class="subcategory-item" onclick="filterByCategory('electronics', 'audio')">Audio</div>
+            <div class="subcategory-item" onclick="filterByCategory('electronics', 'wearables')">Wearables</div>
+            <div class="subcategory-item" onclick="filterByCategory('electronics', 'chargers')">Chargers</div>
+        </div>
+        
+        <div class="category-item" onclick="toggleSubcategories('accessories')">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <svg class="icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                    <strong>Accessories</strong>
+                </div>
+                <span class="badge bg-secondary">4</span>
+            </div>
+        </div>
+        <div class="subcategory-list" id="accessories-subs">
+            <div class="subcategory-item" onclick="filterByCategory('accessories', 'eyewear')">Eyewear</div>
+            <div class="subcategory-item" onclick="filterByCategory('accessories', 'bags')">Bags</div>
+            <div class="subcategory-item" onclick="filterByCategory('accessories', 'watches')">Watches</div>
+        </div>
+        
+        <div class="category-item" onclick="toggleSubcategories('footwear')">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <svg class="icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                    <strong>Footwear</strong>
+                </div>
+                <span class="badge bg-secondary">3</span>
+            </div>
+        </div>
+        <div class="subcategory-list" id="footwear-subs">
+            <div class="subcategory-item" onclick="filterByCategory('footwear', 'athletic')">Athletic</div>
+            <div class="subcategory-item" onclick="filterByCategory('footwear', 'casual')">Casual</div>
+            <div class="subcategory-item" onclick="filterByCategory('footwear', 'outdoor')">Outdoor</div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sample product data
+        const products = [
+            { id: 1, name: "Wireless Earbuds Pro", price: 89.99, category: "electronics", subcategory: "audio", image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400&h=300&fit=crop&q=80" },
+            { id: 2, name: "Smart Watch Series 5", price: 299.99, category: "electronics", subcategory: "wearables", image: "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=400&h=300&fit=crop&q=80" },
+            { id: 3, name: "Premium Sunglasses", price: 129.99, category: "accessories", subcategory: "eyewear", image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400&h=300&fit=crop&q=80" },
+            { id: 4, name: "Leather Backpack", price: 159.99, category: "accessories", subcategory: "bags", image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=300&fit=crop&q=80" }
+        ];
+
+        let currentFilter = { category: 'all', subcategory: null };
+
+        // Toggle Category Menu
+        function toggleCategoryMenu() {
+            const sidebar = document.getElementById('categoryMenuSidebar');
+            const overlay = document.getElementById('categoryOverlay');
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
+        }
+
+        function closeCategoryMenu() {
+            document.getElementById('categoryMenuSidebar').classList.remove('show');
+            document.getElementById('categoryOverlay').classList.remove('show');
+        }
+
+        // Toggle Subcategories
+        function toggleSubcategories(category) {
+            const subList = document.getElementById(category + '-subs');
+            subList.classList.toggle('show');
+        }
+
+        // Filter by Category
+        function filterByCategory(category, subcategory = null) {
+            currentFilter = { category, subcategory };
+            renderCustomerProducts();
+            closeCategoryMenu();
+        }
+
+        // Handle Sign-in
+        function handleSignin(e) {
+            e.preventDefault();
+            
+            const userType = document.getElementById('userType').value;
+            const email = document.getElementById('email').value;
+            
+            // Hide signin page
+            document.getElementById('signinPage').classList.add('hidden');
+            
+            // Show appropriate interface
+            if (userType === 'customer') {
+                document.getElementById('customerInterface').classList.remove('hidden');
+                renderCustomerProducts();
+            } else if (userType === 'seller') {
+                document.getElementById('sellerInterface').classList.remove('hidden');
+            } else if (userType === 'admin') {
+                document.getElementById('adminInterface').classList.remove('hidden');
+            }
+            
+            return false;
+        }
+
+        // Sign Out
+        function signOut() {
+            document.getElementById('customerInterface').classList.add('hidden');
+            document.getElementById('sellerInterface').classList.add('hidden');
+            document.getElementById('adminInterface').classList.add('hidden');
+            document.getElementById('signinPage').classList.remove('hidden');
+            document.getElementById('signinForm').reset();
+        }
+
+        // Render Customer Products
+        function renderCustomerProducts() {
+            const container = document.getElementById('customerProducts');
+            container.innerHTML = products.map(p => `
+                <div class="product-card">
+                    <img src="${p.image}" alt="${p.name}" class="product-image">
+                    <div class="p-3">
+                        <h5 class="h6 mb-2">${p.name}</h5>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-primary">$${p.price.toFixed(2)}</span>
+                            <button class="btn btn-sm btn-primary">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Show Seller Section
+        function showSellerSection(section) {
+            document.getElementById('sellerProducts').classList.add('hidden');
+            document.getElementById('sellerOrders').classList.add('hidden');
+            document.getElementById('sellerAdd').classList.add('hidden');
+            document.getElementById('sellerAccount').classList.add('hidden');
+            
+            // Update active nav item
+            document.querySelectorAll('.seller-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (section === 'products') {
+                document.getElementById('sellerProducts').classList.remove('hidden');
+                document.querySelectorAll('.seller-nav-item')[0].classList.add('active');
+            } else if (section === 'orders') {
+                document.getElementById('sellerOrders').classList.remove('hidden');
+                document.querySelectorAll('.seller-nav-item')[1].classList.add('active');
+            } else if (section === 'add') {
+                document.getElementById('sellerAdd').classList.remove('hidden');
+                document.querySelectorAll('.seller-nav-item')[2].classList.add('active');
+            } else if (section === 'account') {
+                document.getElementById('sellerAccount').classList.remove('hidden');
+                document.querySelectorAll('.seller-nav-item')[3].classList.add('active');
+            }
+        }
+
+        // Show Admin Section
+        function showAdminSection(section) {
+            document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('adminUsers').classList.add('hidden');
+            document.getElementById('adminProducts').classList.add('hidden');
+            document.getElementById('adminOrders').classList.add('hidden');
+            document.getElementById('adminSettings').classList.add('hidden');
+            
+            // Update active nav item
+            document.querySelectorAll('.admin-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (section === 'dashboard') {
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                document.querySelectorAll('.admin-nav-item')[0].classList.add('active');
+            } else if (section === 'users') {
+                document.getElementById('adminUsers').classList.remove('hidden');
+                document.querySelectorAll('.admin-nav-item')[1].classList.add('active');
+            } else if (section === 'products') {
+                document.getElementById('adminProducts').classList.remove('hidden');
+                document.querySelectorAll('.admin-nav-item')[2].classList.add('active');
+            } else if (section === 'orders') {
+                document.getElementById('adminOrders').classList.remove('hidden');
+                document.querySelectorAll('.admin-nav-item')[3].classList.add('active');
+            } else if (section === 'settings') {
+                document.getElementById('adminSettings').classList.remove('hidden');
+                document.querySelectorAll('.admin-nav-item')[4].classList.add('active');
+            }
+        }
+
+        // Toggle Account Menu
+        function toggleAccountMenu(type) {
+            const menu = document.getElementById(type + 'AccountMenu');
+            menu.classList.toggle('hidden');
+            
+            // Close menu when clicking outside
+            if (!menu.classList.contains('hidden')) {
+                setTimeout(() => {
+                    document.addEventListener('click', function closeMenu(e) {
+                        if (!e.target.closest('.account-dropdown')) {
+                            menu.classList.add('hidden');
+                            document.removeEventListener('click', closeMenu);
+                        }
+                    });
+                }, 100);
+            }
+        }
+
+        // Show Account Settings Modal
+        function showAccountSettings(type) {
+            document.getElementById('accountModal').classList.remove('hidden');
+            toggleAccountMenu(type);
+        }
+
+        // Show Order History
+        function showOrderHistory() {
+            document.getElementById('orderModal').classList.remove('hidden');
+            document.getElementById('customerAccountMenu').classList.add('hidden');
+        }
+
+        // Close Modals
+        function closeAccountModal(event) {
+            if (!event || event.target.classList.contains('modal-backdrop-custom')) {
+                document.getElementById('accountModal').classList.add('hidden');
+            }
+        }
+
+        function closeOrderModal(event) {
+            if (!event || event.target.classList.contains('modal-backdrop-custom')) {
+                document.getElementById('orderModal').classList.add('hidden');
+            }
+        }
+
+        // Customer search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('customerSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const query = e.target.value.toLowerCase();
+                    const filtered = products.filter(p => 
+                        p.name.toLowerCase().includes(query)
+                    );
+                    const container = document.getElementById('customerProducts');
+                    container.innerHTML = filtered.map(p => `
+                        <div class="product-card">
+                            <img src="${p.image}" alt="${p.name}" class="product-image">
+                            <div class="p-3">
+                                <h5 class="h6 mb-2">${p.name}</h5>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold text-primary">${p.price.toFixed(2)}</span>
+                                    <button class="btn btn-sm btn-primary">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
